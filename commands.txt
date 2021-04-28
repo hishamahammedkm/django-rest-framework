@@ -1,0 +1,24 @@
+virtualenv venv
+source venv/bin/activate
+pip install django
+django-admin startproject restapi .
+python manage.py startapp api
+python manage.py runserver
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py shell
+pip freeze > requirements.txt
+pip install -r requirements.txt
+
+
+from api.models import Article
+from api.serializers import ArticleSerializers
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
+a = Article(title='book2',email='book2@gm.in',author='hisham2')
+a.save()
+serializer = ArticleSerializers(a)
+serializer.data
+content = JSONRenderer().render(serializer.data)
+serializer = ArticleSerializers(Article.objects.all(),many=True)
