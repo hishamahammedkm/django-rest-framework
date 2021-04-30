@@ -10,6 +10,32 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 
+from rest_framework import generics, mixins
+
+
+class GenericApiView(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, mixins.RetrieveModelMixin, mixins.DestroyModelMixin):
+    serializer_class = ArticleSerializers
+    queryset = Article.objects.all()
+    lookup_field = 'id'
+
+    def get(self, request, id=None):
+        if id:
+            return self.retrieve(request)
+
+        else:
+            
+            return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def put(self, request, id=None):
+
+        return self.update(request, id)
+
+    def delete(self, request, id):
+        return self.destroy(request, id)
+
 
 class ArticleApiView(APIView):
     def get(self, request):
@@ -33,12 +59,12 @@ class ArticleDetails(APIView):
         except Article.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def get(self,request,id):
+    def get(self, request, id):
         article = self.get_object(id)
         serializer = ArticleSerializers(article)
         return Response(serializer.data)
-    
-    def put(self,request,id):
+
+    def put(self, request, id):
         article = self.get_object(id)
         serializer = ArticleSerializers(article, data=request.data)
         if serializer.is_valid():
@@ -46,15 +72,12 @@ class ArticleDetails(APIView):
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-  
 
-    def delete(self,request,id):
+    def delete(self, request, id):
         article = self.get_object(id)
         article.delete()
         return Response('deleted', status=status.HTTP_404_NOT_FOUND)
 
-
-        
 
 @api_view(['GET', 'PSOT'])
 def article_list(request):
